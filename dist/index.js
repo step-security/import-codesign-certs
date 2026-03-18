@@ -53,7 +53,7 @@ async function validateSubscription() {
         const payload = JSON.parse((0, fs_1.readFileSync)(eventPath, 'utf8'));
         repoPrivate = payload?.repository?.private;
     }
-    const upstream = 'oven-sh/setup-bun';
+    const upstream = 'Apple-Actions/import-codesign-certs';
     const action = process.env.GITHUB_ACTION_REPOSITORY;
     const docsUrl = 'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions';
     (0, core_1.info)('');
@@ -96,19 +96,28 @@ async function run() {
         if (p12Filepath === '' && p12FileBase64 === '') {
             throw new Error('At least one of p12-filepath or p12-file-base64 must be provided');
         }
+        let tempFileCleanup;
         if (p12FileBase64 !== '') {
             const buffer = Buffer.from(p12FileBase64, 'base64');
-            const tempFile = (0, tmp_1.fileSync)();
+            const tempFile = (0, tmp_1.fileSync)({ mode: 0o600 });
+            tempFileCleanup = tempFile.removeCallback;
             p12Filepath = tempFile.name;
-            (0, fs_1.writeFileSync)(p12Filepath, buffer);
+            (0, fs_1.writeFileSync)(p12Filepath, buffer, { mode: 0o600 });
         }
-        if (keychainPassword === '') {
-            // generate a keychain password for the temporary keychain
-            keychainPassword = Math.random().toString(36);
+        try {
+            if (keychainPassword === '') {
+                // generate a keychain password for the temporary keychain
+                keychainPassword = Math.random().toString(36);
+            }
+            (0, core_1.setOutput)('keychain-password', keychainPassword);
+            (0, core_1.setSecret)(keychainPassword);
+            await (0, security_1.installCertIntoTemporaryKeychain)(keychain, createKeychain, keychainPassword, p12Filepath, p12Password);
         }
-        (0, core_1.setOutput)('keychain-password', keychainPassword);
-        (0, core_1.setSecret)(keychainPassword);
-        await (0, security_1.installCertIntoTemporaryKeychain)(keychain, createKeychain, keychainPassword, p12Filepath, p12Password);
+        finally {
+            if (tempFileCleanup) {
+                tempFileCleanup();
+            }
+        }
     }
     catch (error) {
         if (error instanceof Error) {

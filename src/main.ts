@@ -21,7 +21,7 @@ async function validateSubscription() {
     const payload = JSON.parse(readFileSync(eventPath, 'utf8'))
     repoPrivate = payload?.repository?.private
   }
-  const upstream = 'oven-sh/setup-bun'
+  const upstream = 'Apple-Actions/import-codesign-certs'
   const action = process.env.GITHUB_ACTION_REPOSITORY
   const docsUrl =
     'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions'
@@ -79,28 +79,36 @@ async function run(): Promise<void> {
       )
     }
 
+    let tempFileCleanup: (() => void) | undefined
     if (p12FileBase64 !== '') {
       const buffer = Buffer.from(p12FileBase64, 'base64')
-      const tempFile = fileSync()
+      const tempFile = fileSync({mode: 0o600})
+      tempFileCleanup = tempFile.removeCallback
       p12Filepath = tempFile.name
-      writeFileSync(p12Filepath, buffer)
+      writeFileSync(p12Filepath, buffer, {mode: 0o600})
     }
 
-    if (keychainPassword === '') {
-      // generate a keychain password for the temporary keychain
-      keychainPassword = Math.random().toString(36)
+    try {
+      if (keychainPassword === '') {
+        // generate a keychain password for the temporary keychain
+        keychainPassword = Math.random().toString(36)
+      }
+
+      setOutput('keychain-password', keychainPassword)
+      setSecret(keychainPassword)
+
+      await installCertIntoTemporaryKeychain(
+        keychain,
+        createKeychain,
+        keychainPassword,
+        p12Filepath,
+        p12Password
+      )
+    } finally {
+      if (tempFileCleanup) {
+        tempFileCleanup()
+      }
     }
-
-    setOutput('keychain-password', keychainPassword)
-    setSecret(keychainPassword)
-
-    await installCertIntoTemporaryKeychain(
-      keychain,
-      createKeychain,
-      keychainPassword,
-      p12Filepath,
-      p12Password
-    )
   } catch (error) {
     if (error instanceof Error) {
       setFailed(error.message)
