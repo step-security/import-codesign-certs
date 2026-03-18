@@ -24,6 +24,11 @@ on:
         required: false
         type: string  
         default: "4.9.4"
+      node_version:
+        description: "Specify Node.js version"
+        required: false
+        type: string
+        default: "24"
 
   pull_request:
     types: [opened, synchronize, labeled]
@@ -46,3 +51,5 @@ jobs:
       package_manager: ${{inputs.package_manager || 'yarn' }}
       script: ${{ inputs.script || 'yarn all' }}
       yarn_version: ${{ inputs.yarn_version || '4.9.4' }}
+      node_version: ${{ inputs.node_version || '24' }}
+

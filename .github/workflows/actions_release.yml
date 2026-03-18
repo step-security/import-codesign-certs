@@ -16,6 +16,11 @@ on:
         required: false
         type: string  
         default: "4.9.4"
+      node_version:
+        description: "Specify Node.js version"
+        required: false
+        type: string
+        default: "24"
 
 permissions:
   contents: read
@@ -32,3 +37,5 @@ jobs:
       tag: "${{ github.event.inputs.tag }}"
       script: "${{ github.event.inputs.script }}"
       yarn_version: ${{ github.event.inputs.yarn_version || '4.9.4' }}
+      node_version: ${{ github.event.inputs.node_version }}
+
