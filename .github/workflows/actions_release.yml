@@ -1,0 +1,41 @@
+name: Release GitHub Actions
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag for the release"
+        required: true
+      script:
+        description: "Specify the build script to run"
+        required: true
+        type: string
+        default: "yarn all"
+      yarn_version:
+        description: "Specify a yarn version"
+        required: false
+        type: string  
+        default: "4.9.4"
+      node_version:
+        description: "Specify Node.js version"
+        required: false
+        type: string
+        default: "24"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+
+    uses: step-security/reusable-workflows/.github/workflows/actions_release.yaml@v1
+    with:
+      tag: "${{ github.event.inputs.tag }}"
+      script: "${{ github.event.inputs.script }}"
+      yarn_version: ${{ github.event.inputs.yarn_version || '4.9.4' }}
+      node_version: ${{ github.event.inputs.node_version }}
+

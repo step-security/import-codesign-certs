@@ -1,0 +1,45 @@
+name: Check dist/
+
+run-name: Check dist/
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  check-dist:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Enable corepack (workaround)
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Rebuild the dist/ directory
+        run: |
+          yarn build
+          yarn package
+
+      - name: Compare the expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "::error::Detected uncommitted changes after build. Run 'yarn build' and commit the changes."
+            git diff --text -v
+            exit 1
+          fi
+        id: diff

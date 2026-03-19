@@ -1,0 +1,47 @@
+{
+  "name": "import-codesign-certs",
+  "version": "6.1.0",
+  "private": true,
+  "description": "GitHub Action for Importing Code-signing Certificates into a Keychain",
+  "main": "lib/main.js",
+  "engines": {
+    "node": "24"
+  },
+  "scripts": {
+    "build": "tsc --outDir lib",
+    "format": "prettier --write src/",
+    "format-check": "prettier --check src/",
+    "knip": "knip",
+    "lint": "eslint",
+    "package": "ncc build --license licenses.txt",
+    "all": "yarn format && yarn knip && yarn lint && yarn build && yarn package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/step-security/import-codesign-certs.git"
+  },
+  "keywords": [
+    "actions",
+    "node",
+    "setup"
+  ],
+  "author": "step-security",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "~2.0.0",
+    "@actions/exec": "~2.0.0",
+    "axios": "^1.13.6",
+    "tmp": "~0.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "~24.9.0",
+    "@types/tmp": "~0.2.0",
+    "@vercel/ncc": "~0.38.0",
+    "eslint": "~9.39.0",
+    "eslint-plugin-github": "~6.0.0",
+    "knip": "~5.78.0",
+    "prettier": "~3.7.0",
+    "typescript": "~5.9.0"
+  },
+  "packageManager": "yarn@4.9.4"
+}

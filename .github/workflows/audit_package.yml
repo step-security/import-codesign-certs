@@ -1,0 +1,47 @@
+name: NPM Audit Fix Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_branch:
+        description: "Specify a base branch"
+        required: false
+        default: "main"
+      package_manager:
+        description: "Specify package manager (npm or yarn)"
+        required: false
+        default: "yarn"
+      script:
+        description: "Specify the build script to run"
+        required: true
+        type: string
+        default: "yarn all"
+      yarn_version:
+        description: "Specify a yarn version"
+        required: false
+        type: string  
+        default: "4.9.4"
+      node_version:
+        description: "Specify Node.js version"
+        required: false
+        type: string
+        default: "24"
+
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  audit-fix:
+    uses: step-security/reusable-workflows/.github/workflows/audit_fix.yml@v1
+    with:
+      base_branch: ${{ inputs.base_branch || 'main' }}
+      package_manager: ${{inputs.package_manager || 'yarn' }}
+      script: ${{ inputs.script || 'yarn all' }}
+      yarn_version: ${{ inputs.yarn_version || '4.9.4' }}
+      node_version: ${{ inputs.node_version || '24' }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: read
+  issues: write
