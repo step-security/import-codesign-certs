@@ -6,8 +6,6 @@
 
 ## Getting Started
 
-Use the same GitHub secrets as the rest of the [Apple-Actions](https://github.com/Apple-Actions) suite.
-
 ### Canonical GitHub ENVs
 
 | Kind | Name | Purpose |
