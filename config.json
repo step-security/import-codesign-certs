@@ -5,8 +5,8 @@
   "action_type": "node",
   "upstream": {
     "repository": "Apple-Actions/import-codesign-certs",
-    "synced_tag": "v7.1.0",
-    "synced_commit": "77ba2a2a8f5cfc8c405ebf3159f767c323e238f9",
+    "synced_tag": "v7.2.0",
+    "synced_commit": "288b8ec97b82c66b6f2a6baaf7acc8dfbcbe331c",
     "archived": false
   },
   "build": {
